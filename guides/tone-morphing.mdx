@@ -1,0 +1,92 @@
+---
+title: "Tone morphing"
+description: "Blend two patches together using a morphing factor to create new sounds that sit between two tonal extremes."
+---
+
+Tone morphing blends two patches — tone A and tone B — into a single result using a **morphing factor**. The resulting patch is sent to the synthesizer immediately and named **MORPH-X**.
+
+<Warning>
+  Tone morphing is marked as untested in the source code. Use it as an experimental tool and verify the result on the synthesizer before saving.
+</Warning>
+
+---
+
+## How morphing works
+
+For each eligible parameter, the result value is calculated as:
+
+```
+result = (1 - f) × A + f × B
+```
+
+Where:
+- `A` is the parameter value from tone A (the first file)
+- `B` is the parameter value from tone B (the second file)
+- `f` is the morphing factor (0.0 to 1.0)
+
+At `f = 0.0`, the result is identical to tone A. At `f = 1.0`, the result is identical to tone B. Values in between blend the two tones proportionally.
+
+---
+
+## The modulation matrix in morphing
+
+<Note>
+  The modulation matrix of the resulting patch comes entirely from **tone A** (the first file). The modulation matrices of the two tones are not blended — combining two different modulation matrices is not meaningful. Only the scalar parameters are morphed.
+</Note>
+
+---
+
+## Eligible parameters
+
+Morphing applies to parameters that are represented as continuous knobs in the Xplorer interface — that is, parameters with a numeric range of at least 0–31 (such as 0–63, −31 to +31, or 0–127). This includes:
+
+- VCO frequencies, detune values, pulse width, volume
+- VCF frequency, resonance, VCA volumes
+- FM amplitude, lag rate
+- Envelope delay, attack, decay, sustain, release, amplitude (ENV 1–5)
+- LFO speed and amplitude (LFO 1–5)
+- Ramp rates (RAMP 1–4)
+- Keyboard tracking points (TRACK 1–3)
+
+Boolean flags (on/off buttons), filter mode, waveform selectors, and modulation matrix parameters are **not** morphed.
+
+---
+
+## Morphing procedure
+
+<Steps>
+  <Step title="Open the Tone Morphing dialog">
+    Choose **Tools → Tone Morphing** from the Xplorer menu.
+  </Step>
+
+  <Step title="Select tone A">
+    Click the first file browser button and choose a `.syx` single-patch file. This will be tone A (the starting point). The modulation matrix of the result will be taken from this tone.
+  </Step>
+
+  <Step title="Select tone B">
+    Click the second file browser button and choose a second `.syx` single-patch file. This will be tone B (the ending point).
+  </Step>
+
+  <Step title="Set the morphing factor">
+    Adjust the **Morphing Factor** slider or field:
+    - `0.0` — result is identical to tone A
+    - `0.5` — result is an equal blend of A and B
+    - `1.0` — result is identical to tone B
+  </Step>
+
+  <Step title="Click OK">
+    Xplorer reads both patch files, computes the morphed result, sets the patch name to `MORPH-X`, and sends the full patch to the synthesizer immediately. All controls in the Xplorer window update to show the morphed values.
+  </Step>
+</Steps>
+
+---
+
+## After morphing
+
+The morphed patch is in the synthesizer's edit buffer but has **not** been stored to memory. To keep the result:
+
+- Click **Save** to write it as a `.syx` file.
+- Click **Store** and choose a program slot to write it into the synthesizer's patch memory.
+- Click **Rename** to give it a meaningful name before saving or storing.
+
+See [Patch management](/guides/patch-management) for details on these operations.

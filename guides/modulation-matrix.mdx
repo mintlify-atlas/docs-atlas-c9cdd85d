@@ -1,0 +1,105 @@
+---
+title: "Modulation matrix"
+description: "Configure the Xpander's 20-entry modulation matrix with up to 6 sources per destination."
+---
+
+The Xpander and Matrix-12 feature a flexible modulation matrix that routes modulation sources to destinations with per-entry amount and quantize settings. Xplorer displays all 20 entries and lets you edit them in real time.
+
+---
+
+## Matrix overview
+
+| Property | Value |
+|---|---|
+| Total entries | 20 (`MODENTRIES_COUNT = 20`) |
+| Maximum sources per destination | 6 (`MAX_MODULATION_SOURCE = 6`) |
+| Amount range | −63 to +63 |
+| Quantize | 0 (off) or 1 (on) |
+
+Each of the 20 entries has:
+- A **destination** (which parameter is being modulated)
+- A **source** (what is driving the modulation)
+- An **amount** (modulation depth, −63 to +63)
+- A **quantize** flag (quantizes the modulation to semitone steps when on)
+
+---
+
+## Modulation sources
+
+The following sources are available in the modulation matrix:
+
+| Source | Description |
+|---|---|
+| `KBD` | Keyboard (note pitch) |
+| `LAG` | Lag processor output |
+| `VEL` | Note velocity |
+| `RVEL` | Release velocity |
+| `PRES` | Aftertouch / pressure |
+| `TRK1`, `TRK2`, `TRK3` | Keyboard tracking generators |
+| `RMP1`, `RMP2`, `RMP3`, `RMP4` | Ramp generators |
+| `ENV1`, `ENV2`, `ENV3`, `ENV4`, `ENV5` | Envelopes |
+| `PED1`, `PED2` | Pedal inputs |
+| `LFO1`, `LFO2`, `LFO3`, `LFO4`, `LFO5` | LFOs |
+| `VIB` | Vibrato |
+| `LEV1`, `LEV2` | Level controllers |
+| `NONE` | No source (entry is free) |
+
+---
+
+## Modulation destinations
+
+| Category | Destinations |
+|---|---|
+| VCO 1 | `VCO1_FRQ`, `VCO1_PW`, `VCO1_VOL` |
+| VCO 2 | `VCO2_FRQ`, `VCO2_PW`, `VCO2_VOL` |
+| VCF / VCA | `VCF_FRQ`, `VCF_RES`, `VCA1_VOL`, `VCA2_VOL` |
+| LFO 1–5 | `LFOx_SPD`, `LFOx_AMP` (per LFO) |
+| ENV 1–5 | `ENVx_DLY`, `ENVx_ATK`, `ENVx_DCY`, `ENVx_REL`, `ENVx_AMP` (per envelope) |
+| FM / Lag | `FM_AMP`, `LAG_RATE` |
+
+---
+
+## Adding, changing, and removing entries
+
+### Add a modulation entry
+
+1. In the modulation matrix panel, find an entry whose **Source** shows `NONE`.
+2. Click the **Source** drop-down for that entry and select the desired source.
+3. Click the **Destination** drop-down and select the parameter you want to modulate.
+4. Adjust the **Amount** knob or field (range −63 to +63).
+5. Enable the **Quantize** checkbox if you want the modulation quantized to semitones.
+
+The change is transmitted to the synthesizer immediately.
+
+### Change a source or destination
+
+Click the **Source** or **Destination** drop-down for an existing entry and select a new value. Only destinations that have not yet reached the 6-source limit are shown as available.
+
+### Remove an entry
+
+Set the **Source** for the entry to `NONE`. This resets the entry (amount is cleared, quantize is turned off) and frees the slot.
+
+---
+
+## Amount and quantize
+
+- **Amount** ranges from −63 to +63. Positive amounts add the modulation signal; negative amounts invert it.
+- **Quantize** (0 or 1) — when enabled, the modulation is stepped in semitone increments. Useful for pitch modulation sources like envelopes driving VCO frequency.
+
+---
+
+## Limitation: no MIDI automation for the modulation matrix
+
+<Warning>
+  MIDI CC automation is **not available** for modulation matrix entries. You cannot automate a matrix source, destination, amount, or quantize value from a hardware controller or DAW. All other patch parameters (226 total) support MIDI automation.
+</Warning>
+
+Matrix changes made on the synthesizer panel (add source, change source, set amount, set quantize) are reflected in Xplorer in real time through the Xpander sysex modulation-edit protocol.
+
+---
+
+## Source count limit per destination
+
+Each destination can have at most **6 sources** simultaneously. When a destination has reached this limit, it is not shown in the destination drop-down for new entries, except for entries that already target that destination (so you can still change their source or amount).
+
+The modulation matrix panel grays out the source drop-down for entries where the destination has already reached the 6-source limit.

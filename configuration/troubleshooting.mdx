@@ -1,0 +1,98 @@
+---
+title: 'Troubleshooting'
+description: 'Diagnose and fix common Xplorer issues including MIDI connectivity problems, build errors, and platform requirements.'
+---
+
+## Enable diagnostic traces
+
+Xplorer writes diagnostic output to a log file. To increase the verbosity, edit `xplorer.config` in the same directory as `xplorer.exe` and set the logger switch value:
+
+```xml
+<system.diagnostics>
+  <switches>
+    <add name="MidiApp.MidiController.Service.Logger" value="0" />
+  </switches>
+</system.diagnostics>
+```
+
+| Value | Level |
+|---|---|
+| `0` | Off (default) |
+| `1` | Error |
+| `2` | Warning |
+| `3` | Info |
+| `4` | Verbose |
+
+<Warning>
+  Set the value back to `0` after diagnosing your issue. Verbose logging (`4`) writes every SysEx message to disk and will grow the log file quickly under normal use.
+</Warning>
+
+The log file is written to:
+
+```
+\ProgramData\Xplorer\Xplorer\applog.txt
+```
+
+## Common issues
+
+<AccordionGroup>
+  <Accordion title="Synth not syncing — parameters don't appear on the synthesizer">
+    **Symptoms:** You change a parameter in Xplorer but the synthesizer does not respond.
+
+    **Checks:**
+    1. Open **Settings → MIDI** and confirm the **Synth output device** matches the MIDI port connected to your synthesizer's MIDI IN.
+    2. Confirm the **MIDI channel** matches the channel set on your Xpander or Matrix-12.
+    3. Verify your MIDI interface is recognized by Windows — check Device Manager for any driver errors.
+    4. Use [MIDI-OX](http://www.midiox.com/) to monitor the MIDI output port and confirm SysEx messages are being sent.
+  </Accordion>
+
+  <Accordion title="Parameters not updating in Xplorer when editing on the synth">
+    **Symptoms:** You tweak a knob on the synthesizer but Xplorer's display does not update.
+
+    **Checks:**
+    1. Open **Settings → MIDI** and confirm the **Synth input device** is set to the MIDI port connected to your synthesizer's MIDI OUT. It must not be set to `None`.
+    2. Confirm the **MIDI channel** matches the synthesizer's channel.
+    3. Use [MIDI-OX](http://www.midiox.com/) to verify that the synthesizer is actually sending SysEx messages when you edit parameters on the front panel.
+  </Accordion>
+
+  <Accordion title="CC automation not reaching Xplorer from DAW or controller">
+    **Symptoms:** Moving a controller knob or playing back DAW automation has no effect in Xplorer.
+
+    **Checks:**
+    1. Open **Settings → MIDI** and confirm the **Automation input device** is set to the correct port (or virtual cable port if using a DAW).
+    2. Confirm the CC number your controller sends matches the assignment in the automation table.
+    3. Check that the DAW MIDI output is routed to the virtual cable's output port, and that Xplorer's automation input is set to the virtual cable's input port.
+    4. Use [MIDI-OX](http://www.midiox.com/) to verify CC messages are arriving on the expected port.
+  </Accordion>
+
+  <Accordion title="Build error: Sanford.Multimedia DLL not found">
+    **Symptoms:** Visual Studio reports it cannot find `Sanford.Multimedia.Midi` when building.
+
+    **Fix:** Reference the DLL from the submodule path inside the repository — do **not** install it from NuGet:
+
+    ```
+    .\MidiApp\3rdParty\Sanford.Multimedia.Midi
+    ```
+
+    <Warning>
+      Do not add an external reference to any `Sanford.Multimedia` NuGet package found on GitHub. The binary interface may not match the version bundled in this repository and will cause runtime errors.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Build error: wrong platform target (x64 or AnyCPU)">
+    **Symptoms:** The application crashes at startup or fails to load the MIDI interface with a platform-related exception.
+
+    **Fix:** In Visual Studio, set the solution platform to **x86**. The project uses 32-bit platform-invoke mappings in a third-party library that are incompatible with x64 or AnyCPU targets.
+
+    1. Open **Build → Configuration Manager**.
+    2. Set the **Active solution platform** to `x86`.
+    3. Rebuild the solution.
+
+    The output binary is `XplorerEditor\Xplorer\bin\x86\Debug\xplorer.exe`.
+  </Accordion>
+</AccordionGroup>
+
+## Useful tools and references
+
+- **MIDI-OX** — a free Windows MIDI monitor and diagnostic utility. Use it to inspect raw SysEx and CC messages on any MIDI port. Available at [http://www.midiox.com/](http://www.midiox.com/).
+- **Oberheim Xpander/Matrix-12 MIDI specification** — the latest MIDI spec for these synthesizers is maintained at [https://github.com/xplorer2716/OberheimXpanderMidiSpec](https://github.com/xplorer2716/OberheimXpanderMidiSpec). Consult this when debugging unexpected SysEx behavior.

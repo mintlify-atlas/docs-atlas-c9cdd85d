@@ -1,0 +1,86 @@
+---
+title: 'MIDI automation'
+description: 'Assign CC numbers to Xplorer parameters and integrate with a DAW or hardware controller for real-time patch automation.'
+---
+
+Xplorer supports real-time MIDI automation for all patch parameters through freely assignable Control Change (CC) numbers. You can automate parameters from a hardware controller, a DAW, or any MIDI source — including parameters such as filter mode that most editors do not expose to automation.
+
+<Note>
+  Modulation Matrix entries (source, destination, amount, quantize) cannot be automated via CC numbers. All other parameters across every page of the patch are automatable.
+</Note>
+
+## How automation works
+
+When Xplorer receives a CC message on the **Automation input device**, it looks up the parameter assigned to that CC number in the automation table, updates the parameter value in the UI, and immediately sends the corresponding SysEx message to the synthesizer. There is no need to reload the patch.
+
+All changes are reflected in real time — Xplorer's display shows which parameter is being modified as the CC messages arrive.
+
+## Assign a CC number to a parameter
+
+<Steps>
+  <Step title="Open Settings">
+    Open the **Settings** dialog from the main menu.
+  </Step>
+
+  <Step title="Go to the MIDI page">
+    Click **MIDI** to display the MIDI settings page. The automation table at the bottom lists every automatable parameter and its current CC assignment.
+  </Step>
+
+  <Step title="Select a parameter row">
+    Click the row for the parameter you want to reassign. Click the **CC** column cell to enter edit mode — a dropdown appears with all 128 standard CC names.
+  </Step>
+
+  <Step title="Choose a CC number">
+    Select the CC number from the dropdown. The assignment updates immediately in the table.
+  </Step>
+
+  <Step title="Click OK">
+    Click **OK** to save. Xplorer begins responding to the new CC number for that parameter right away.
+  </Step>
+</Steps>
+
+<Tip>
+  To reset all CC assignments to their factory defaults at once, right-click anywhere in the automation table and choose **Reset control changes**.
+</Tip>
+
+## Automation input device
+
+The **Automation input device** (configured on the MIDI settings page) is a dedicated MIDI input port used only for incoming CC messages. Separating this from the synth input device ensures that CC traffic from a controller or DAW does not interfere with the SysEx messages coming back from the synthesizer.
+
+Set this to `None` if you are not using a hardware controller or DAW automation.
+
+## DAW integration with a virtual MIDI cable
+
+To control Xplorer parameters from your DAW's automation lanes:
+
+<Steps>
+  <Step title="Install a virtual MIDI cable">
+    Install a virtual MIDI cable driver such as [LoopBe1](http://www.nerds.de/en/loopbe1.html). This creates a pair of virtual MIDI ports that route data between applications on the same machine.
+  </Step>
+
+  <Step title="Set the DAW MIDI output">
+    In your DAW, configure a MIDI track's output to the virtual cable's output port (for example, `LoopBe Internal MIDI`).
+  </Step>
+
+  <Step title="Set the Xplorer automation input">
+    In Xplorer's **Settings → MIDI**, set the **Automation input device** to the virtual cable's input port (the other end of the same pair).
+  </Step>
+
+  <Step title="Draw or record CC automation in the DAW">
+    Draw automation curves or record CC knob movements in your DAW. As the DAW plays back, its CC messages flow through the virtual cable into Xplorer, which updates both the UI and the synthesizer in real time.
+  </Step>
+</Steps>
+
+## Program change handling
+
+When Xplorer receives a Program Change message on the automation input or synth input device, it switches to the corresponding patch on the synthesizer **and** updates Xplorer's display to show the new patch. This means you can trigger patch changes from a DAW or footswitch without losing synchronization between Xplorer and the synthesizer.
+
+## Export the automation table
+
+You can export your full CC assignment table as an HTML file for reference:
+
+1. Open **Settings → MIDI**.
+2. Right-click the automation table.
+3. Choose **Export as HTML file**.
+
+Xplorer opens the exported file in your default browser. The table lists every parameter name alongside its assigned CC number.

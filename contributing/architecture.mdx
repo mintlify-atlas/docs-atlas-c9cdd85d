@@ -1,0 +1,152 @@
+---
+title: "Architecture"
+description: "Overview of Xplorer's three-layer MVC architecture: Controller, Model, and View."
+---
+
+Xplorer is a concrete application built on top of the `MidiApp.MidiController` base framework (the `MidiApp` submodule). The framework provides abstract base classes for the controller, tone model, parameter, tone reader/writer, and main form. Xplorer implements each of these for the Oberheim Xpander and Matrix-12 synthesizers.
+
+The project follows a three-layer MVC structure:
+
+| Layer | Xplorer class | Base class (MidiApp) |
+|---|---|---|
+| Controller | `XpanderController` | `AbstractController` |
+| Model (tone) | `XpanderTone` | `AbstractTone` |
+| Model (parameter) | `XpanderParameter` and subtypes | `AbstractParameter` |
+| Model (I/O) | `XPanderToneReader` / `XPanderToneWriter` | `IToneReader` / `IToneWriter` |
+| View | `MainForm` | `AbstractControllerMainForm` |
+
+## Layers
+
+<AccordionGroup>
+  <Accordion title="Controller layer">
+    ### XpanderController
+
+    `XpanderController` is `sealed` and split across 6 partial files, each responsible for a distinct concern:
+
+    | File | Responsibility |
+    |---|---|
+    | `XpanderController.cs` | MIDI lifecycle (`Start`, `Stop`), tone load/save, randomize, morph, all-data-dump extraction |
+    | `XpanderController.MIDIEvents.cs` | SysEx and channel message reception from synth and automation input |
+    | `XpanderController.ModulationMatrix.cs` | Modulation matrix changes (source, destination, amount, quantize) |
+    | `XpanderController.Clipboard.cs` | Page clipboard: copy/paste of ENV, LFO, RAMP, TRACK parameter pages |
+    | `XpanderController.Events.cs` | Declares and fires all five Xplorer-specific events |
+    | `XpanderController.WorkerThread.cs` | Overrides the base worker thread to inject page-select SysEx before each parameter send |
+
+    ### Worker thread
+
+    The worker thread runs a continuous loop: it scans for changed parameters, enqueues clones, and dequeues them one at a time. Before sending each parameter message, it checks whether the Xpander page has changed and, if so, sends a page-select SysEx command and waits an additional delay before proceeding.
+
+    ### PageSubPageHelper
+
+    `PageSubPageHelper` (`sealed`) tracks the last page and subpage sent to the synth. It exposes `UpdatePageSubPage`, `GetPageSubPage`, and guards such as `IsPageEnvLfoRampTrack` and `IsRotaryEventAuthorized`.
+
+    ### AllDataDumpRequestState
+
+    `AllDataDumpRequestState` (`sealed`) is a state machine that coordinates multi-step all-data-dump reception. It holds the destination path, reception mode, and accumulated single/multi-patch buffers until all 200 patches (100 single + 100 multi) have arrived.
+
+    ### Xplorer-specific events
+
+    The controller raises five events beyond the base `AutomationParameterChangeEvent`:
+
+    | Event | Carries |
+    |---|---|
+    | `FullToneChangeEvent` | Full parameter map + modulation matrix |
+    | `PageChangeEvent` | Page name and subpage index |
+    | `ModulationEntryChangeEvent` | A single modulation matrix entry and the changed parameter |
+    | `AllDataDumpRequestProgressionEvent` | Current `AllDataDumpRequestState` |
+    | `MIDIDataSendReceiveEvent` | Which MIDI device triggered the activity |
+  </Accordion>
+
+  <Accordion title="Model layer">
+    ### XpanderTone
+
+    `XpanderTone` is `sealed` and split across 3 partial files:
+
+    - **`XpanderTone.cs`** — ordered parameter map, `ToByteArray` / `FromByteArray` serialization, tone morphing eligibility
+    - **`XpanderTone.Properties.cs`** — program number, VCO detune, frequency tuning, post-randomize matrix fixup
+    - **`XpanderTone.ModulationMatrix.cs`** — 20-entry modulation matrix: change source, destination, amount, quantize; randomize; clear
+
+    ### Parameter hierarchy
+
+    All parameter types extend `AbstractParameter` (from MidiApp):
+
+    | Type | Description |
+    |---|---|
+    | `XpanderParameter` | Adds `Page`, `SubPage`, and `PageSelectMessage` for Xpander page-select SysEx |
+    | `XpanderSignedParameter` | Sealed; handles signed (bipolar) encoding |
+    | `XpanderModMatrixParameter` | Sealed; carries source ID and modulation command for mod matrix entries |
+    | `XpanderFullToneParameter` | Sealed; full-tone SysEx bypass, not page-based |
+
+    ### Tone reader and writer
+
+    `XPanderToneReader` and `XPanderToneWriter` implement `IToneReader` / `IToneWriter`. They use `PacketizedBinaryReader` and `PacketizedBinaryWriter` to encode and decode Oberheim's 7-bit SysEx binary format. `XPanderToneReader` also exposes `ReadTones` for batch reading from an all-data-dump file, using `SinglePatchIterator` to skip non-single-patch data.
+
+    ### ModulationMatrixEntry
+
+    Each of the 20 modulation matrix entries (`ModulationMatrixEntry`) holds a destination, source, source ID, amount (−63 to +63), and quantize value.
+  </Accordion>
+
+  <Accordion title="View layer">
+    ### MainForm
+
+    `MainForm` is `sealed` and partial. It holds a reference to `XpanderController` and delegates complex operations to three manager classes:
+
+    | Manager | Responsibility |
+    |---|---|
+    | `SettingsManager` | Load and save `AllUsersSettings` (MIDI config, randomizer config, UI preferences) |
+    | `FileOperationsManager` | Load/save tones, extract single tones, backup/restore all-data-dump |
+    | `ModulationMatrixManager` | Respond to mod matrix UI events; update the mod matrix display |
+
+    ### VfdDisplayHelper
+
+    `VfdDisplayHelper` (`sealed`) drives the on-screen VFD (vacuum fluorescent display) simulation. It updates the display control for a single parameter change, a full tone reload, or a modulation matrix entry change.
+
+    ### Auxiliary forms
+
+    Eight additional forms cover specialized workflows:
+
+    | Form | Purpose |
+    |---|---|
+    | `SplashScreenForm` | Startup splash with step-by-step progress |
+    | `AboutForm` | Credits and version information |
+    | `ToneMorphingForm` | Select two tone files and a morphing factor |
+    | `ProgressForm` | Progress indicator for long-running operations |
+    | `RenamePatchForm` | Rename the current patch |
+    | `StoreAndGotoPatchForm` | Store to or jump to a program number |
+    | `ExtractSingleToneForm` | Choose destination folder for single-tone extraction |
+    | `SettingsForm` | Multi-page settings dialog (MIDI, Randomizer, UI) |
+  </Accordion>
+</AccordionGroup>
+
+## Key differences from the MidiApp base framework
+
+| Concern | MidiApp.MidiController (base) | Xplorer (concrete) |
+|---|---|---|
+| **Controller** | `AbstractController` — generic MIDI lifecycle | `XpanderController` — Xpander/Matrix-12 SysEx protocol, page/subpage, display, clipboard, all-data-dump |
+| **Tone** | `AbstractTone` — ordered parameter map | `XpanderTone` — 20-entry modulation matrix, VCO detune, `ToByteArray`/`FromByteArray` serialization |
+| **Parameters** | `AbstractParameter` — generic min/max/step/value | `XpanderParameter` + `SignedParameter` + `ModMatrixParameter` + `FullToneParameter` — page-select SysEx, signed encoding |
+| **Reader/Writer** | `IToneReader`/`IToneWriter` interfaces | `XPanderToneReader`/`XPanderToneWriter` — packetized binary format, `SinglePatchIterator` |
+| **View** | `AbstractControllerMainForm` — generic registration | `MainForm` — VFD display, mod matrix UI, settings pages, 8+ auxiliary forms |
+| **Events** | `AutomationParameterChangeEvent` only | 5 additional events: `FullToneChange`, `PageChange`, `ModulationEntryChange`, `AllDataDumpProgression`, `MIDIDataSendReceive` |
+| **WorkerThread** | Generic scan → enqueue → dequeue → send | Override adds automatic page-select SysEx before each parameter send |
+| **Settings** | None | `AllUsersSettings` / `AllUsersSettingsService` — MIDI config, randomizer config, UI preferences |
+
+## Design patterns
+
+| Pattern | Where | Description |
+|---|---|---|
+| **Singleton (lazy)** | `MainForm.Controller` property | Lazy initialization of `XpanderController` |
+| **State machine** | `AllDataDumpRequestState` | Tracks multi-step all-data-dump reception |
+| **Page clipboard** | `XpanderController.Clipboard` | Copy/paste of parameter pages (ENV, LFO, RAMP, TRACK) by name-prefix matching |
+| **Manager delegation** | `SettingsManager`, `FileOperationsManager`, `ModulationMatrixManager` | Main form delegates complex operations to focused manager classes |
+| **Packetized I/O** | `PacketizedBinaryReader` / `PacketizedBinaryWriter` | Oberheim's 7-bit SysEx encoding for binary patch data |
+| **Filtered iterator** | `SinglePatchIterator` | Extends `SysexIterator` to skip non-single-patch SysEx blocks |
+
+## External dependencies
+
+| Dependency | Source |
+|---|---|
+| `MidiApp.MidiController` | `MidiApp` submodule |
+| `MidiApp.UIControls` | `MidiApp` submodule |
+| `Sanford.Multimedia.Midi.Core` | `Sanford.Multimedia.Midi` submodule |
+| `System.Windows.Forms` | .NET runtime |

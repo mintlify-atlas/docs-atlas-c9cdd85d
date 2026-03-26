@@ -1,0 +1,80 @@
+{
+  "projectType": "general",
+  "projectName": "Xplorer",
+  "projectDescription": "A real-time, bi-directional patch editor for the Oberheim Xpander and Matrix-12 analog synthesizers, built on .NET/WinForms with full MIDI SysEx support.",
+  "theme": "palm",
+  "primaryColor": "#3B5EA6",
+  "lightColor": "#E8EEF8",
+  "darkColor": "#1A2D5A",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Using Xplorer",
+            "pages": [
+              "guides/midi-setup",
+              "guides/patch-editing",
+              "guides/modulation-matrix",
+              "guides/patch-management",
+              "guides/randomizer",
+              "guides/tone-morphing"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/settings",
+              "configuration/midi-automation",
+              "configuration/troubleshooting"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "contributing/development-setup",
+              "contributing/architecture",
+              "contributing/roadmap"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Real-time bi-directional MIDI SysEx communication with Xpander/Matrix-12",
+    "Edit all 226 patch parameters simultaneously via mouse, MIDI controller, or DAW",
+    "Full modulation matrix editor with 20 entries and 6 sources per destination",
+    "Patch file load/save and bulk extraction from All Data Dump SysEx files",
+    "Full synthesizer memory backup and restore via All Data Dump",
+    "Copy/paste of parameter pages (ENV, LFO, RAMP, TRACK)",
+    "Patch randomizer with configurable VCO, detune, modulation matrix options",
+    "Tone morphing between two patches with adjustable blend factor",
+    "MIDI CC automation for all parameters",
+    "DAW program change integration for patch switching"
+  ],
+  "publicApiSurface": [
+    "XpanderController.Start() / Stop()",
+    "XpanderController.LoadTone(filename)",
+    "XpanderController.SaveTone(filename)",
+    "XpanderController.RandomizeTone(argument)",
+    "XpanderController.MorphTones(first, second, factor)",
+    "XpanderController.ExtractSinglePatchesFromAllDataDumpFileToDirectory()",
+    "XpanderController.DetermineSysexFileType(filename)",
+    "XpanderController.ChangeModulationSource() / Destination() / SourceAmount() / SourceQuantize()",
+    "XpanderController.PasteClipboardTo(dest) / CanClipboardPasteTo(dest)",
+    "XpanderTone.ToByteArray() / FromByteArray(data)",
+    "XPanderToneReader.ReadTone(filename, tone) / ReadTones(filename)",
+    "XPanderToneWriter.WriteTone(filename, tone)",
+    "AllUsersSettingsService.Load() / Save()"
+  ]
+}

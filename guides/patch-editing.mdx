@@ -1,0 +1,114 @@
+---
+title: "Editing patches"
+description: "Edit all 226 parameters of an Xpander or Matrix-12 patch in real time using Xplorer's page-based interface."
+---
+
+Xplorer exposes all **226 parameters** of a single Xpander or Matrix-12 patch. Every change you make in Xplorer is transmitted to the synthesizer immediately, and every knob you turn on the synthesizer is reflected back into Xplorer — with no need to reload or resynchronize.
+
+---
+
+## The page / subpage system
+
+The Xpander organizes its parameters into pages, each with multiple subpages. Xplorer mirrors this structure exactly. Navigate between pages using the radio buttons in the main window.
+
+| Page | Description |
+|---|---|
+| **VCO_1** | Oscillator 1 — frequency, detune, pulse width, volume, waveforms, mods |
+| **VCO_2** | Oscillator 2 — frequency, detune, pulse width, volume, waveforms, FM/sync/noise, mods |
+| **VCF_VCA** | Filter frequency, resonance, filter mode, VCA1/VCA2 volumes, mods |
+| **FM_LAG** | FM amplitude and destination, lag rate, lag mode flags |
+| **ENV_1 – ENV_5** | Five independent ADSR envelopes with delay, sustain, and mode flags |
+| **LFO_1 – LFO_5** | Five LFOs — speed, waveshape, amplitude, retrig, lag |
+| **TRACK_1 – TRACK_3** | Three 5-point keyboard tracking generators |
+| **RAMP_1 – RAMP_4** | Four ramp generators with rate and trigger options |
+
+<Note>
+  Pages for ENV, LFO, TRACK, and RAMP support copy/paste. See [Copy and paste a page](#copy-and-paste-a-page) below.
+</Note>
+
+---
+
+## Editing parameters
+
+<Tabs>
+  <Tab title="Mouse">
+    Click or drag any control in the Xplorer window to change its value. The **VFD display** (the fluorescent display in the upper area of the window) shows the name of the parameter being modified in real time, mirroring the behavior of the physical synthesizer display.
+  </Tab>
+  <Tab title="Hardware MIDI controller">
+    Connect a hardware MIDI controller to the **Automation Input** port configured in Settings → MIDI. Control change messages are mapped to parameters in the automation table. You can assign any CC number (0–127) to any patch parameter — including filter mode.
+  </Tab>
+  <Tab title="DAW">
+    Route a MIDI track in your DAW to the Xplorer automation input via a virtual MIDI cable (for example, LoopBe1). Send control change messages on the assigned CC numbers to automate parameters from your DAW timeline.
+  </Tab>
+  <Tab title="Synth knobs">
+    Turn a knob or press a button on the Xpander or Matrix-12. The synthesizer sends a sysex message that Xplorer receives, decodes, and reflects in the UI — the corresponding control updates immediately without any resync step.
+  </Tab>
+</Tabs>
+
+---
+
+## The VFD display
+
+The VFD display at the top of the Xplorer window mirrors the physical VFD on the Xpander. It shows:
+
+- The **current page and subpage** selected on the synthesizer.
+- The **name of the parameter** most recently changed (from any source: mouse, controller, or synth knobs).
+
+This makes it easy to identify which parameter is being modified when you are using a hardware controller or the synth panel directly.
+
+---
+
+## VCF filter modes
+
+The **VCF_MODE** parameter on the VCF_VCA page selects one of 15 filter configurations unique to the Xpander:
+
+| # | Filter mode |
+|---|---|
+| 0 | 1-pole low-pass |
+| 1 | 2-pole low-pass |
+| 2 | 3-pole low-pass |
+| 3 | 4-pole low-pass |
+| 4 | 1-pole high-pass |
+| 5 | 2-pole high-pass |
+| 6 | 3-pole high-pass |
+| 7 | 2-pole band-pass |
+| 8 | 4-pole band-pass |
+| 9 | 2-pole notch |
+| 10 | 3-pole phase |
+| 11 | 2 high + 1 low |
+| 12 | 3 high + 1 low |
+| 13 | 2 notch + 1 low |
+| 14 | 3 phase + 1 low |
+
+<Tip>
+  Filter mode can be automated via MIDI control change — this is a unique feature of Xplorer not available in generic MIDI editors.
+</Tip>
+
+---
+
+## Copy and paste a page
+
+Xplorer lets you copy all parameters of one ENV, LFO, TRACK, or RAMP page and paste them to another page of the same type.
+
+1. Right-click the page label (for example, **ENV_3**).
+2. Select **Copy ENV_3** from the context menu.
+3. Right-click the destination page label (for example, **ENV_5**).
+4. Select **Paste to ENV_5**.
+
+All parameters from ENV_3 are immediately copied to ENV_5 and transmitted to the synthesizer.
+
+<Note>
+  Paste is only available when source and destination are the same page type (ENV to ENV, LFO to LFO, etc.) and are different pages. You cannot paste ENV_3 to LFO_3 or ENV_3 to itself.
+</Note>
+
+---
+
+## Real-time bidirectional sync
+
+Xplorer maintains a live mirror of the synthesizer's edit buffer:
+
+- Any parameter change you make in Xplorer is sent to the synth with minimal latency.
+- Any knob movement on the synth panel sends a sysex message that Xplorer decodes and applies to the corresponding control.
+- When you change to a different patch on the synth using the panel dial (up or down), Xplorer automatically requests a program dump and updates all controls to match the new patch.
+
+You never need to manually reload a patch to keep Xplorer and the synthesizer in sync.

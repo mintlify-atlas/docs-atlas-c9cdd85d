@@ -1,0 +1,80 @@
+---
+title: "Installation"
+description: "System requirements, download instructions, and MIDI interface setup for Xplorer."
+---
+
+## System requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **OS** | Windows 7, 8, 10, or 11 (x86 / x64) | Windows 10 or 11 (x64) |
+| **Display** | 1280 × 900, 256 colors | 1680 × 1050, 32-bit color |
+| **Runtime** | .NET Desktop Runtime 4.8+ | .NET Desktop Runtime 4.8+ |
+| **MIDI** | One MIDI interface with MIDI IN and MIDI OUT | MIDI interface + one virtual MIDI cable (e.g., LoopBe1) |
+
+<Note>
+  A physical MIDI interface with at least one MIDI IN and one MIDI OUT port is required. For DAW integration, a virtual MIDI cable driver such as [LoopBe1](http://www.nerds.de/en/loopbe1.html) is strongly recommended.
+</Note>
+
+## Install Xplorer
+
+<Steps>
+  <Step title="Download the latest release">
+    Go to the [Xplorer releases page](https://github.com/xplorer2716/XplorerEditor/releases) and download the latest archive (`.zip`). The release also includes the user manual PDF — download that too.
+  </Step>
+  <Step title="Extract the archive">
+    Unzip the downloaded archive to any folder on your PC. No installer is required; Xplorer runs directly from the extracted folder.
+  </Step>
+  <Step title="Launch Xplorer">
+    Double-click `Xplorer.exe` inside the extracted folder. A splash screen appears briefly while the application loads.
+
+    <Note>
+      Only one instance of Xplorer can run at a time. If you try to open a second instance, you will see a warning and the second launch will exit immediately.
+    </Note>
+  </Step>
+  <Step title="Read the manual and configure MIDI">
+    Before editing patches, configure your MIDI input and output ports so Xplorer can communicate with your synthesizer.
+
+    <Warning>
+      **Read the manual before you start.** Correct MIDI configuration is essential. Sending data to the wrong port or channel can cause unexpected behavior on your synthesizer. The user manual PDF is included in the release archive and is also available at the [Xplorer releases page](https://github.com/xplorer2716/XplorerEditor/releases).
+    </Warning>
+
+    See the [MIDI Setup guide](/guides/midi-setup) for step-by-step configuration instructions.
+  </Step>
+</Steps>
+
+## Mac users
+
+Xplorer is a Windows application (.NET / WinForms). If you are on a Mac with an Intel processor, you can run Xplorer using virtualization software (e.g., Parallels or VMware Fusion). See the [community FAQ](http://xplorer.programmer.free.fr/bb/viewtopic.php?id=10) for details.
+
+Alternatively, any inexpensive x64 PC or NUC will run Xplorer without issues.
+
+## Resetting settings
+
+If you need to wipe your configuration and start fresh, launch Xplorer from a command prompt with the `/reset` flag:
+
+```bat
+Xplorer.exe /reset
+```
+
+You will be prompted to confirm before any settings are deleted. Restart Xplorer after the reset completes.
+
+## Troubleshooting
+
+If Xplorer behaves unexpectedly, enable diagnostic logging by editing `xplorer.config` in the application folder:
+
+```xml
+<system.diagnostics>
+  <switches>
+    <add name="MidiApp.MidiController.Service.Logger" value="4" />
+  </switches>
+</system.diagnostics>
+```
+
+Set `value` to `4` for verbose output, or `0` to turn logging off. The log file is written to:
+
+```
+%ProgramData%\Xplorer\Xplorer\applog.txt
+```
+
+For inspecting raw MIDI traffic, [MIDI-OX](http://www.midiox.com/) is a useful companion tool.

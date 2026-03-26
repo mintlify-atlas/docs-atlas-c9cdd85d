@@ -1,0 +1,116 @@
+---
+title: "Development setup"
+description: "How to clone, build, and run Xplorer locally, and how to submit a contribution."
+---
+
+Xplorer is a .NET WinForms application. The project is split across two Git repositories: the main **XplorerEditor** repo and the **MidiApp** submodule, which provides the base MIDI controller framework.
+
+## Prerequisites
+
+- [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
+- .NET Desktop Runtime 4.8 or later
+
+## Setup
+
+<Steps>
+  <Step title="Clone with submodules">
+    The project uses two submodules: `MidiApp` (the base framework) and `Sanford.Multimedia.Midi` (the MIDI I/O library). Use `--recurse-submodules` to fetch them both in one step.
+
+    ```bash
+    git clone --recurse-submodules https://github.com/xplorer2716/XplorerEditor.git
+    ```
+
+    This gives you:
+    - `XplorerEditor/` — the main Xplorer application
+    - `XplorerEditor/MidiApp/` — the MidiApp framework submodule
+    - `XplorerEditor/Sanford.Multimedia.Midi/` — the Sanford MIDI library submodule
+  </Step>
+
+  <Step title="Open the solution">
+    Open `Xplorer.sln` in Visual Studio 2022.
+
+    <Warning>
+      You must select **x86** as the target platform in the solution configuration. The project relies on x86 platform invoke mapping in a third-party library and will not build or run correctly as AnyCPU or x64.
+    </Warning>
+  </Step>
+
+  <Step title="Build the application">
+    Build the solution in Visual Studio.
+
+    <Warning>
+      If Visual Studio cannot find the `Sanford.Multimedia` DLL, add a project reference pointing to the local copy at:
+
+      ```
+      .\MidiApp\3rdParty\Sanford.Multimedia.Midi
+      ```
+
+      Do **not** install the Sanford.Multimedia NuGet package from GitHub or any external source — the binaries may not match the version vendored in this repository.
+    </Warning>
+  </Step>
+
+  <Step title="Run the application">
+    Launch the compiled executable directly:
+
+    ```
+    XplorerEditor\Xplorer\bin\x86\Debug\xplorer.exe
+    ```
+
+    Read the manual to configure MIDI ports and other settings before first use.
+  </Step>
+</Steps>
+
+## Debugging and troubleshooting
+
+Traces are controlled by a switch in `xplorer.config`:
+
+```xml
+<system.diagnostics>
+  <switches>
+    <add name="MidiApp.MidiController.Service.Logger" value="0" />
+  </switches>
+</system.diagnostics>
+```
+
+Set `value` to `4` for verbose output. The log file is written to:
+
+```
+\ProgramData\Xplorer\Xplorer\applog.txt
+```
+
+For MIDI-level debugging, [MIDI-OX](http://www.midiox.com/) is a useful companion tool. The Oberheim Xpander/Matrix-12 MIDI specification is available at [github.com/xplorer2716/OberheimXpanderMidiSpec](https://github.com/xplorer2716/OberheimXpanderMidiSpec).
+
+## Submitting a contribution
+
+<Steps>
+  <Step title="Fork the repository">
+    Fork [xplorer2716/XplorerEditor](https://github.com/xplorer2716/XplorerEditor) on GitHub.
+  </Step>
+
+  <Step title="Create a feature branch">
+    ```bash
+    git checkout -b feature/YourFeature
+    ```
+  </Step>
+
+  <Step title="Commit your changes">
+    ```bash
+    git commit -m 'Add some feature'
+    ```
+  </Step>
+
+  <Step title="Push to your fork">
+    ```bash
+    git push origin feature/YourFeature
+    ```
+  </Step>
+
+  <Step title="Open a pull request">
+    Open a Pull Request against the main repository and describe your changes.
+  </Step>
+</Steps>
+
+## Credits and license
+
+Xplorer uses the **C# MIDI Toolkit** by Leslie Sanford (original source: [codeproject.com/Articles/6228/C-MIDI-Toolkit](https://www.codeproject.com/Articles/6228/C-MIDI-Toolkit)).
+
+Xplorer is licensed under [GPL v3](https://github.com/xplorer2716/XplorerEditor/blob/main/LICENSE).

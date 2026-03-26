@@ -1,0 +1,185 @@
+---
+title: 'Settings'
+description: 'Configure MIDI devices, the patch randomizer, and user interface preferences in Xplorer.'
+---
+
+The **Settings** dialog lets you configure three areas of Xplorer: MIDI devices and automation, the patch randomizer, and the user interface. Open it from the main menu.
+
+When you click **OK**, Xplorer writes your configuration to an XML file at:
+
+```
+%ProgramData%\Xplorer\Xplorer\xplorer.users.config
+```
+
+This location is shared across all Windows user accounts on the machine.
+
+<Tabs>
+  <Tab title="MIDI">
+
+  The **MIDI** page configures the devices Xplorer uses to communicate with your synthesizer and with hardware controllers or DAW software.
+
+  <AccordionGroup>
+    <Accordion title="Synth output device">
+      The MIDI output port connected to your Xpander or Matrix-12's MIDI IN. Xplorer sends SysEx parameter changes and program changes through this port.
+
+      Select the correct port name from the dropdown. If your device is not listed, check that your MIDI interface driver is installed.
+    </Accordion>
+
+    <Accordion title="Synth input device">
+      The MIDI input port connected to your Xpander or Matrix-12's MIDI OUT. Xplorer receives SysEx messages through this port so it can reflect real-time edits you make on the synth itself.
+
+      Set this to `None` if you only need one-way control from Xplorer to the synth.
+    </Accordion>
+
+    <Accordion title="Automation input device">
+      A separate MIDI input port used exclusively for incoming CC messages from a hardware controller or DAW. This keeps automation traffic isolated from the synth's own SysEx messages.
+
+      Set this to `None` if you are not using a hardware controller or DAW automation. When using a DAW, route its MIDI output through a virtual cable (such as LoopBe1) to this port.
+    </Accordion>
+
+    <Accordion title="MIDI channel">
+      The MIDI channel Xplorer uses for both sending and receiving. This must match the channel configured on your Xpander or Matrix-12.
+
+      Default: **1**.
+    </Accordion>
+
+    <Accordion title="Synth type">
+      Select **Xpander** or **Matrix-12**. This controls the default SysEx transmit delay:
+
+      | Synth | Default delay |
+      |---|---|
+      | Xpander | 30 ms |
+      | Matrix-12 | 100 ms |
+    </Accordion>
+
+    <Accordion title="SysEx transmit delay">
+      The delay in milliseconds between consecutive SysEx messages. Increase this value if your synthesizer misses parameter updates under heavy SysEx load. The default presets (30 ms for Xpander, 100 ms for Matrix-12) work for most setups.
+    </Accordion>
+
+    <Accordion title="Editing program number">
+      The patch slot number (0–99) that Xplorer uses as the edit buffer target on the synthesizer. Xplorer sends edits to this program number.
+
+      Default: **99** (the last slot).
+    </Accordion>
+
+    <Accordion title="Smart All Notes Off">
+      When enabled, Xplorer sends an All Notes Off message before loading or randomizing a patch. This prevents stuck notes when the patch changes while notes are held.
+
+      Enabled by default.
+    </Accordion>
+
+    <Accordion title="Automation table">
+      The automation table lists every automatable patch parameter alongside its assigned CC number. Click any row's CC column to assign a different control change number from the dropdown.
+
+      To reset all assignments to their defaults, right-click the table and choose **Reset control changes**.
+
+      You can export the full automation table as an HTML file via the right-click context menu.
+
+      <Note>
+        Modulation Matrix entries are not listed in the automation table. They cannot be automated via CC. See [MIDI automation](/configuration/midi-automation) for details.
+      </Note>
+    </Accordion>
+  </AccordionGroup>
+
+  </Tab>
+
+  <Tab title="Randomizer">
+
+  The **Randomizer** page controls how the patch randomizer generates new sounds. You can constrain certain parameters to produce more musical results.
+
+  <AccordionGroup>
+    <Accordion title="VCO frequency (VCO Freq)">
+      Controls the frequency relationship between VCO1 and VCO2 after randomization.
+
+      | Value | Behavior |
+      |---|---|
+      | **Free** | Both VCO frequencies are fully randomized (default) |
+      | **Same note** | VCO1 and VCO2 are tuned to the same pitch |
+      | **Third** | VCO2 is tuned a third above VCO1 |
+      | **Fifth** | VCO2 is tuned a fifth above VCO1 |
+      | **Seventh** | VCO2 is tuned a seventh above VCO1 |
+      | **Octave** | VCO2 is tuned an octave above VCO1 |
+      | **Ninth** | VCO2 is tuned a ninth above VCO1 |
+      | **Eleventh** | VCO2 is tuned an eleventh above VCO1 |
+      | **Thirteenth** | VCO2 is tuned a thirteenth above VCO1 |
+    </Accordion>
+
+    <Accordion title="VCO detune">
+      Controls how the VCO detune values are set during randomization.
+
+      | Value | Behavior |
+      |---|---|
+      | **Free** | Detune parameters are fully randomized (default) |
+      | **Digital** | A small, precise detune is applied to simulate a digitally-tuned ensemble |
+      | **Analog** | A wider, organic detune is applied to simulate analog drift |
+    </Accordion>
+
+    <Accordion title="VCO2 options (FM, Noise, Sync)">
+      Three checkboxes control whether VCO2's more extreme features are included in randomization:
+
+      - **Enable FM** — allows the FM amplitude and FM destination parameters to be randomized. When unchecked, FM parameters are excluded and kept at zero.
+      - **Enable Noise** — allows the VCO2 noise waveshape to be randomized. When unchecked, noise is excluded.
+      - **Enable Sync** — allows VCO2 hard sync to be randomized. When unchecked, sync is excluded.
+
+      All three are enabled by default.
+    </Accordion>
+
+    <Accordion title="VCA2 envelope preset">
+      Constrains the shape of the VCA2 (amplitude) envelope after randomization so patches remain playable.
+
+      | Value | Shape | Description |
+      |---|---|---|
+      | **Free** | Fully random | No envelope constraint (default) |
+      | **Organ** | `\|--|` | Instant attack, full sustain, instant release |
+      | **String** | `/--\` | Slow attack, full sustain, slow release |
+      | **Percusive** | `\|-\|` | Instant attack, short decay, no release |
+      | **Percusive with release** | `\|-\` | Instant attack, short decay, medium release |
+
+      This is applied after the modulation matrix is randomized so any ENV2→VCA2 routing is preserved.
+    </Accordion>
+
+    <Accordion title="Modulation matrix options">
+      Three checkboxes control what aspects of the modulation matrix are randomized:
+
+      - **Enable amount** — randomizes the modulation amount for each entry.
+      - **Enable sources and destinations** — randomizes which sources and destinations are used.
+      - **Enable quantize** — randomizes the quantize flag for each modulation entry.
+
+      All three are enabled by default.
+    </Accordion>
+  </AccordionGroup>
+
+  </Tab>
+
+  <Tab title="User Interface">
+
+  The **User Interface** page controls knob appearance and interaction behavior.
+
+  <AccordionGroup>
+    <Accordion title="Knob movement mode">
+      Controls how you adjust knob values with the mouse:
+
+      - **Linear** — drag up/down to increase/decrease the value (default). Recommended for most users.
+      - **Circular** — rotate the mouse around the knob center to change its value.
+    </Accordion>
+
+    <Accordion title="Knob style">
+      Controls the visual style of all knob controls:
+
+      - **Standard** — a rounded, three-dimensional knob style.
+      - **Flat** — a flat, minimalist knob style.
+    </Accordion>
+
+    <Accordion title="Knob LED border color">
+      Sets the accent color used for the LED indicator ring on all knobs, and for the Settings page navigation button borders.
+
+      Click the color swatch to open the color picker. The default color is a light blue (`#66B5E3`).
+    </Accordion>
+  </AccordionGroup>
+
+  <Info>
+    Xplorer automatically adjusts its window size based on your system's default font size (Windows display scaling). No manual resize is needed.
+  </Info>
+
+  </Tab>
+</Tabs>

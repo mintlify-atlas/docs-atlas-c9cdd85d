@@ -1,0 +1,105 @@
+---
+title: "Patch randomizer"
+description: "Generate new patches from randomized parameter values, with configurable constraints on oscillators, envelopes, and the modulation matrix."
+---
+
+The patch randomizer generates a completely new patch from random values and sends it to the synthesizer immediately. The resulting patch is named **RANDOM**. Before triggering randomization, configure the options in Settings → Randomizer to control which parts of the patch are constrained and which are fully free.
+
+## Triggering randomization
+
+Click the **Random** button in the Xplorer toolbar. The current patch is replaced with a new randomly generated one and transmitted to the synthesizer. The patch name is set to `RANDOM`.
+
+---
+
+## Configuring the randomizer
+
+Open **Settings → Randomizer** to configure the randomization options before clicking Random.
+
+<AccordionGroup>
+  <Accordion title="VCO2 options" icon="wave-square">
+    Controls which VCO 2 features are eligible for randomization. These are flag options — you can enable any combination.
+
+    | Option | Description |
+    |---|---|
+    | **Enable FM** | Allow FM amplitude and FM destination parameters to be randomized. If off, FM is excluded (FM_AMP and FM_DESTINATION are fixed at zero). |
+    | **Enable Noise** | Allow VCO2 noise waveform to be randomized. If off, VCO2_WAVESHAPE_NOISE is excluded. |
+    | **Enable Sync** | Allow VCO2 oscillator sync to be randomized. If off, VCO2_WAVE_SYNC is excluded. |
+  </Accordion>
+
+  <Accordion title="VCO frequency" icon="music">
+    Controls how VCO1 and VCO2 base frequencies are set during randomization.
+
+    | Value | Description |
+    |---|---|
+    | **Free** | Frequencies are fully randomized — no constraints. |
+    | **SameNote** | Both oscillators are tuned to the same pitch. |
+    | **Third** | VCO2 is tuned a third above VCO1. |
+    | **Fifth** | VCO2 is tuned a fifth above VCO1. |
+    | **Seventh** | VCO2 is tuned a seventh above VCO1. |
+    | **Octave** | VCO2 is tuned one octave above VCO1. |
+    | **Ninth** | VCO2 is tuned a ninth above VCO1. |
+    | **Eleventh** | VCO2 is tuned an eleventh above VCO1. |
+    | **Thirteenth** | VCO2 is tuned a thirteenth above VCO1. |
+
+    When any value other than **Free** is selected, VCO1_FREQ and VCO2_FREQ are set by Xplorer according to the chosen interval and excluded from further randomization.
+  </Accordion>
+
+  <Accordion title="VCO detune" icon="sliders">
+    Controls how oscillator detune values are generated.
+
+    | Value | Description |
+    |---|---|
+    | **Free** | VCO1_DETUNE and VCO2_DETUNE are fully randomized within their range. |
+    | **Digital** | Detune is set to a small, precise value — tight, nearly in-tune detuning. |
+    | **Analog** | Detune is set to a wider, organic value — warm, analog-style detuning. |
+
+    When Digital or Analog is selected, VCO1_DETUNE and VCO2_DETUNE are excluded from further randomization.
+  </Accordion>
+
+  <Accordion title="VCA envelope shape" icon="chart-line">
+    Constrains the shape of ENV2 (which typically drives VCA2) to a musically useful envelope type.
+
+    | Value | Description |
+    |---|---|
+    | **Free** | Envelope parameters are fully randomized. |
+    | **Organ** | Instant attack, full sustain, no release (box shape). |
+    | **String** | Slow attack, full sustain, slow release. |
+    | **Percusive** | Fast attack, fast decay, no sustain or release. |
+    | **PercusiveWithRelease** | Fast attack, fast decay, with a short release tail. |
+
+    <Note>
+      The VCA envelope shape is applied **after** modulation matrix randomization, so the ENV2→VCA2 routing is added or enforced at that stage.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Modulation matrix" icon="network-wired">
+    Controls how the modulation matrix is randomized. These are flag options — you can enable any combination.
+
+    | Flag | Description |
+    |---|---|
+    | **Enable Amount** | Randomize the modulation amount (depth) for each entry. |
+    | **Enable Sources and Destinations** | Randomize which sources and destinations are used in each entry. |
+    | **Enable Quantize** | Randomize the quantize setting for each entry. |
+
+    If all three flags are off, the modulation matrix is left unchanged during randomization.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## What the randomizer does
+
+When you click **Random**, Xplorer:
+
+1. Stops the worker thread and clears the clipboard.
+2. Applies the configured exclusions (FM, noise, sync, detune, frequency intervals).
+3. Randomizes all non-excluded parameters in the parameter map.
+4. Randomizes the modulation matrix according to the configured flags.
+5. Optionally forces a specific VCA2 envelope shape (applied after matrix randomization).
+6. Names the patch `RANDOM`.
+7. Sends the complete new patch to the synthesizer.
+8. Restarts the worker thread.
+
+<Info>
+  The randomizer uses a humanize ratio that blends random values with the current parameter values, so results can range from subtle variations to completely new sounds depending on the ratio setting.
+</Info>

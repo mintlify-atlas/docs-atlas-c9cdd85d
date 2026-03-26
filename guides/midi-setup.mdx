@@ -1,0 +1,110 @@
+---
+title: "MIDI Setup"
+description: "Configure MIDI ports and channels so Xplorer can communicate with your Oberheim Xpander or Matrix-12."
+---
+
+Xplorer communicates with your synthesizer over MIDI. Before you can edit patches, you must configure four MIDI devices in Settings: two required connections to the synth and two optional connections for hardware controllers or DAW integration.
+
+## Opening the MIDI settings page
+
+Click the **Settings** button in the Xplorer toolbar, then select the **MIDI** tab.
+
+---
+
+## MIDI devices
+
+<CardGroup cols={2}>
+  <Card title="Synth Output" icon="arrow-right">
+    The MIDI output port connected to the synthesizer's **MIDI IN** jack. This is how Xplorer sends parameter changes and sysex to the synth. **Required.**
+  </Card>
+  <Card title="Synth Input" icon="arrow-left">
+    The MIDI input port connected to the synthesizer's **MIDI OUT** jack. This is how Xplorer receives knob movements and program dumps from the synth. **Required.**
+  </Card>
+  <Card title="Automation Input" icon="sliders">
+    An optional MIDI input port for a hardware MIDI controller or DAW. Control change messages received here are mapped to patch parameters via the automation table.
+  </Card>
+</CardGroup>
+
+---
+
+## Configuration procedure
+
+<Steps>
+  <Step title="Connect your MIDI interface">
+    Wire your MIDI interface so that:
+    - Interface **OUT** → Synthesizer **MIDI IN**
+    - Interface **IN** ← Synthesizer **MIDI OUT**
+
+    If you are also using a DAW, install a virtual MIDI cable driver (for example, **LoopBe1**) so that Xplorer and your DAW can exchange MIDI data on the same machine without a physical cable.
+  </Step>
+
+  <Step title="Open Settings → MIDI">
+    Launch Xplorer and click the **Settings** button in the toolbar. Select the **MIDI** tab.
+  </Step>
+
+  <Step title="Select Synth Output device">
+    In the **Synth Output** drop-down, choose the output port that is physically connected to the synthesizer's MIDI IN jack. This field is required; Xplorer cannot send patch data without it.
+  </Step>
+
+  <Step title="Select Synth Input device">
+    In the **Synth Input** drop-down, choose the input port connected to the synthesizer's MIDI OUT jack. This field is required for real-time bidirectional editing.
+  </Step>
+
+  <Step title="Select Automation Input device (optional)">
+    If you use a hardware MIDI controller or want your DAW to automate patch parameters, choose the appropriate input port in the **Automation Input** drop-down. Select **None** if unused.
+
+    <Tip>
+      For DAW integration on a single PC, set Automation Input to the **LoopBe1** (or equivalent virtual MIDI cable) output that your DAW sends on.
+    </Tip>
+  </Step>
+
+  <Step title="Set the MIDI channel">
+    Set the **MIDI Channel** field to match the channel configured on your Xpander or Matrix-12. The default is channel 1. All sysex and program-change messages are sent on this channel.
+  </Step>
+
+  <Step title="Choose your synthesizer type">
+    Select either **Xpander** or **Matrix-12**. This setting changes the SysEx transmit delay:
+    - Xpander default: 30 ms
+    - Matrix-12 default: 100 ms
+
+    You can fine-tune the delay with the **SysEx Transmit Delay** spinner if your synthesizer requires more time between messages.
+  </Step>
+
+  <Step title="Click OK">
+    Click **OK** to apply and save the settings. Xplorer reconnects to the configured devices immediately.
+  </Step>
+</Steps>
+
+---
+
+## MIDI channel and editing program number
+
+| Setting | Description |
+|---|---|
+| **MIDI Channel** | The MIDI channel on which all messages are exchanged with the synth (1–16). |
+| **Editing Program Number** | The patch slot (0–99) Xplorer uses as its working edit buffer when it first connects. |
+| **SysEx Transmit Delay** | Milliseconds between consecutive sysex messages; increase if you hear clicks or dropped edits. |
+
+---
+
+## DAW integration with a virtual MIDI cable
+
+To automate patch parameters from a DAW on the same computer:
+
+1. Install **LoopBe1** (http://www.nerds.de/en/loopbe1.html) or another virtual MIDI cable driver.
+2. In your DAW, route a MIDI track output to the LoopBe1 port.
+3. In Xplorer Settings → MIDI, set **Automation Input** to the corresponding LoopBe1 input.
+4. Assign control change numbers to parameters in the automation table (same MIDI tab).
+
+<Note>
+  Xplorer supports real-time MIDI automation for all 226 patch parameters via freely assignable control change numbers, **except** modulation matrix entries. See [Modulation matrix](/guides/modulation-matrix) for details.
+</Note>
+
+---
+
+## Debugging MIDI traffic
+
+If communication with the synthesizer is not working as expected:
+
+- Enable verbose logging by setting `MidiApp.MidiController.Service.Logger` to `4` in `xplorer.config`. The log file is written to `\ProgramData\Xplorer\Xplorer\applog.txt`.
+- Use **MIDI-OX** (http://www.midiox.com/) to inspect the raw MIDI messages flowing between Xplorer and your synthesizer.

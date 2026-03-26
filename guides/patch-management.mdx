@@ -1,0 +1,110 @@
+---
+title: "Patch management"
+description: "Load, save, rename, store, and back up Xpander and Matrix-12 patches with Xplorer."
+---
+
+Xplorer provides a full set of patch management operations for both individual patches and the complete synthesizer memory.
+
+---
+
+## Sysex file types
+
+| Type | Description |
+|---|---|
+| `SingleTone` | A `.syx` file containing exactly one single-patch sysex message. |
+| `AllDataDump` | A `.syx` file containing the complete synthesizer memory: 100 single patches and 100 multi patches. |
+
+Xplorer automatically detects the file type when you open a `.syx` file.
+
+---
+
+## Individual patch operations
+
+### Load a patch from file
+
+Click **Load** in the toolbar (or use the menu). Select a `.syx` file that contains a single tone. Xplorer reads the file, updates all controls, and sends the full patch to the synthesizer immediately.
+
+### Save the current patch to file
+
+Click **Save** in the toolbar. Choose a location and filename. The current patch is written as a `SingleTone` sysex file (`.syx`).
+
+### Rename a patch
+
+Click the patch name field in the Xplorer window (or use the menu). Enter the new name.
+
+<Note>
+  Patch names are exactly **8 characters** long (`TONE_NAME_LENGTH = 8`). Names shorter than 8 characters are padded with spaces; names longer than 8 characters are truncated.
+</Note>
+
+After you confirm the new name, Xplorer sends the complete patch to the synthesizer so the new name appears on the synth display, then requests a program dump to resync.
+
+### Go to patch
+
+Use the **Go To Patch** control to select a program number (0–99). There are **100 single patches** in the synthesizer's memory. Xplorer sends a program change followed by a program dump request; the synthesizer responds with the patch data, which Xplorer displays.
+
+### Store patch to synthesizer memory
+
+Click **Store**. Enter the destination program number (0–99). Xplorer sends the current patch data followed by a store command, permanently writing it into the synthesizer's patch memory at that slot.
+
+---
+
+## Extracting single patches from an All Data Dump file
+
+If you have an All Data Dump `.syx` file (for example, a full bank backup), you can extract each patch to individual files:
+
+1. Open the **File** menu and choose **Extract Single Patches from All Data Dump**.
+2. Select the All Data Dump `.syx` file.
+3. Choose a destination folder.
+
+Xplorer reads the file, parses all single-patch sysex messages, and writes one `.syx` file per patch into the selected folder. Filenames are derived from the patch names (with uniqueness enforced).
+
+---
+
+## Get all patches from synthesizer
+
+Choose **File → Get All Single Patches from Synthesizer**. Xplorer sends an All Data Dump request to the synth, waits to receive all 100 single patches, and saves each as an individual `.syx` file in a folder you specify.
+
+<Info>
+  This operation requires the **Synth Output** and **Synth Input** MIDI devices to be configured correctly. See [MIDI Setup](/guides/midi-setup).
+</Info>
+
+---
+
+## Backup and restore (All Data Dump)
+
+The All Data Dump lets you save and restore the entire synthesizer memory (100 single patches + 100 multi patches) to a single `.syx` file.
+
+### Backup procedure
+
+<Steps>
+  <Step title="Open the backup dialog">
+    Choose **File → Backup All Data Dump to File**.
+  </Step>
+  <Step title="Choose a destination file">
+    Enter a filename and click **Save**.
+  </Step>
+  <Step title="Wait for the dump to complete">
+    Xplorer sends an All Data Dump request to the synthesizer. A progress bar shows reception. The synthesizer transmits all 100 single patches followed by all 100 multi patches. When the counter reaches 100/100, the file is written to disk automatically.
+  </Step>
+</Steps>
+
+### Restore procedure
+
+<Steps>
+  <Step title="Open the restore dialog">
+    Choose **File → Restore All Data Dump to Synthesizer**.
+  </Step>
+  <Step title="Select the backup file">
+    Choose the `.syx` All Data Dump file you previously backed up.
+  </Step>
+  <Step title="Confirm and wait">
+    Xplorer reads all sysex messages from the file and sends them to the synthesizer one by one, with a 150 ms delay between each message to avoid overwhelming the synth. A progress bar tracks the operation.
+  </Step>
+  <Step title="Resync">
+    After all messages are sent, Xplorer requests the current program from the synthesizer to restore the edit state.
+  </Step>
+</Steps>
+
+<Warning>
+  Restoring an All Data Dump **overwrites the entire synthesizer memory**. Make sure you have a backup before proceeding.
+</Warning>

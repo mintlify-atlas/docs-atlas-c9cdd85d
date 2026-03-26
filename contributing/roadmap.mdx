@@ -1,0 +1,49 @@
+---
+title: "Roadmap"
+description: "Current status of Xplorer and the plan to migrate to JUCE for cross-platform support."
+---
+
+Xplorer is the only truly functional editor for the Oberheim Xpander and Matrix-12 synthesizers.
+
+<Note>
+  Xplorer is in **maintenance mode**. The author fixes bugs as needed but is not adding new features. You are welcome to fork the project, implement features, and submit pull requests.
+</Note>
+
+## Migration to JUCE
+
+Xplorer was started roughly ten years ago as a personal project and later commercialized for several years. To ensure its long-term survival and to unlock native Mac and Linux support, the recommended path forward is a migration to [JUCE](https://juce.com) — a perennial, cross-platform C++ framework for audio applications.
+
+The migration breaks down into three parts, ordered from least to most complex:
+
+<Steps>
+  <Step title="Replace the MIDI implementation">
+    Swap the C# MIDI layer (Leslie Sanford's C# MIDI Toolkit) for its JUCE C++ equivalent. Only the functions actively used by Xplorer need to be ported: MIDI port configuration, sending SysEx and channel messages, and receiving SysEx and channel messages. For someone familiar with JUCE, this is the most straightforward part of the migration.
+  </Step>
+
+  <Step title="Migrate the MidiApp framework to C++">
+    Convert the `MidiApp.MidiController` framework — the Model and Controller layers — from C# to C++. This includes `AbstractController`, `AbstractTone`, `AbstractParameter`, the worker thread, and the event system. The work is mechanical for a developer comfortable in both C# and C++, but it requires careful attention to the threading model and the parameter change/enqueue/dequeue pipeline.
+  </Step>
+
+  <Step title="Reimplement the UI in JUCE">
+    This is the largest effort. The Xplorer UI is built on .NET WinForms, which has been pushed to its limits for transparency management, dynamic control layout, and the in-house binding between UI controls and the controller. A full reimplementation in JUCE's component system is required. Knowledge of both WinForms and JUCE UI programming is needed to do this well.
+  </Step>
+</Steps>
+
+## How to contribute
+
+<CardGroup cols={2}>
+  <Card title="Fix a bug" icon="bug">
+    Browse [open issues](https://github.com/xplorer2716/XplorerEditor/issues) on GitHub, pick one, and submit a pull request with a fix.
+  </Card>
+  <Card title="Implement a feature" icon="code">
+    Fork the repository, create a feature branch, and open a pull request describing what you built and why.
+  </Card>
+  <Card title="Start the JUCE migration" icon="arrow-right">
+    Pick up one of the three migration steps above. Even a partial MIDI-layer port would be a meaningful contribution.
+  </Card>
+  <Card title="Improve documentation" icon="book-open">
+    Corrections, clarifications, and new documentation pages are all welcome via pull request.
+  </Card>
+</CardGroup>
+
+See [Development setup](/contributing/development-setup) for instructions on cloning the repository and submitting a pull request.

@@ -1,97 +1,58 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Xplorer — Real-time Editor for Oberheim Xpander & Matrix-12"
+description: "Edit every parameter of your Oberheim Xpander or Matrix-12 in real time. Bi-directional MIDI SysEx, full modulation matrix, patch management, and more."
 ---
 
-## Setting up
+Xplorer is a real-time, bi-directional software editor for the Oberheim Xpander and Matrix-12 analog synthesizers. Every knob turn on your synth is reflected instantly in Xplorer — and every change you make in Xplorer is sent to the synth with minimal latency. No patch reloads. No resynchronization.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Download the latest release and get Xplorer running on Windows in minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Connect your synthesizer and make your first real-time edit.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="MIDI Setup" icon="plug" href="/guides/midi-setup">
+    Configure MIDI ports for your synth, automation controller, and DAW.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Patch Editing" icon="sliders" href="/guides/patch-editing">
+    Navigate the 226 parameters across VCO, VCF, VCA, ENV, LFO, RAMP, and TRACK pages.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What Xplorer does
 
-Everything you need to create world-class documentation.
+Xplorer gives you a complete overview of a single patch — including the full Modulation Matrix — in one screen. You can tweak sound simultaneously with a mouse, a hardware MIDI controller, your DAW, or directly on the synthesizer. All methods stay in sync automatically.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={2}>
+  <Card title="Modulation Matrix" icon="diagram-project" href="/guides/modulation-matrix">
+    Manage all 20 modulation entries with up to 6 sources per destination.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Patch Management" icon="folder-open" href="/guides/patch-management">
+    Load, save, rename, extract, backup, and restore patches and full memory dumps.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Randomizer" icon="shuffle" href="/guides/randomizer">
+    Generate new patches from random values with configurable VCO, detune, and modulation settings.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Tone Morphing" icon="wand-magic-sparkles" href="/guides/tone-morphing">
+    Blend two patches together with a variable morphing factor.
   </Card>
-</Columns>
+</CardGroup>
 
-## Need inspiration?
+## Get started in three steps
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Steps>
+  <Step title="Download and install">
+    Grab the latest release from [GitHub Releases](https://github.com/xplorer2716/XplorerEditor/releases), unzip the archive, and launch **Xplorer.exe**. No installer required.
+  </Step>
+  <Step title="Configure MIDI">
+    Open **Settings → MIDI** and select your synth's MIDI OUT and MIDI IN ports. Optionally add an automation input device for hardware controller support.
+  </Step>
+  <Step title="Start editing">
+    Xplorer automatically requests the current patch from your synthesizer on first start. Turn a knob on the synth or click a control in Xplorer — both stay in sync in real time.
+  </Step>
+</Steps>
+
+<Note>
+  Xplorer runs on Windows 7, 8, 10, and 11 (x86/x64). A minimum display resolution of 1280×900 is required. Mac users can run Xplorer via virtualization — see [Installation](/installation) for details.
+</Note>
